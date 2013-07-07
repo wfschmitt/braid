@@ -22,7 +22,7 @@ module Braid
   end
 
   def self.use_local_cache
-    [nil, "true", "1"].include?(ENV["BRAID_USE_LOCAL_CACHE"])
+    [nil, "false", "0"].include?(ENV["BRAID_USE_LOCAL_CACHE"])
   end
 
   def self.local_cache_dir

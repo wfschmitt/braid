@@ -13,7 +13,7 @@ module Braid
           # http://www.kernel.org/pub/software/scm/git/docs/howto/using-merge-subtree.html
 
           setup_remote(mirror)
-          mirror.fetch(mirror.remote)
+          mirror.fetch
 
           new_revision    = validate_new_revision(mirror, options["revision"])
           target_revision = determine_target_revision(new_revision)
