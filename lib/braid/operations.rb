@@ -1,6 +1,14 @@
 require 'singleton'
 require 'rubygems'
-require defined?(JRUBY_VERSION) ? 'open3' : 'open4'
+
+if defined?(JRUBY_VERSION) || RUBY_PLATFORM =~ /(win|w32)/
+  require'open3'
+  VER_WIN32=true
+else
+  VER_WIN32=false
+  require 'open4'
+end
+
 require 'tempfile'
 
 module Braid
@@ -103,22 +111,36 @@ module Braid
         ENV['LANG']   = 'C'
 
         out, err = nil
+        status,pid = 0
+
         log(cmd)
 
-        if defined?(JRUBY_VERSION)
+
+        if defined? JRUBY_VERSION
           Open3.popen3(cmd) do |stdin, stdout, stderr|
             out = stdout.read
             err = stderr.read
           end
           status = $?.exitstatus
+        else if VER_WIN32
+            Open3.popen3(cmd) { |stdin, stdout, stderr, wait_thr|
+              pid = wait_thr.pid # pid of the started process.
+              out = stdout.read
+              err = stderr.read
+              status = wait_thr.value # Process::Status object returned.
+            }
         else
-          status = Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
+          Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
             err = stderr.read
-          end.exitstatus
+            status = exitstatus
+          end
+        end
+
         end
 
         [status, out, err]
+
       ensure
         ENV['LANG'] = previous_lang
       end
@@ -284,7 +306,7 @@ module Braid
       end
 
       def apply(diff, *args)
-        err = nil
+        err,status = nil
 
         if defined?(JRUBY_VERSION)
           Open3.popen3("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |stdin, stdout, stderr|
@@ -293,6 +315,14 @@ module Braid
             err = stderr.read
           end
           status = $?.exitstatus
+        else if VER_WIN32
+          Open3.popen3("git apply --index --whitespace=nowarn #{args.join(' ')} -") { |stdin, stdout, stderr, wait_thr|
+            stdin.puts(diff)
+            stdin.close
+            err = stderr.read
+            status = wait_thr.value # Process::Status object returned.
+          }
+          status = $?.exitstatus
         else
           status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
             stdin.puts(diff)
@@ -300,6 +330,8 @@ module Braid
             err = stderr.read
           end.exitstatus
         end
+        end
+
 
         raise ShellExecutionError, err unless status == 0
         true

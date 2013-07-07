@@ -12,3 +12,5 @@ rdoc
 /*.iml
 /*.ipr
 /*.iws
+Gemfile.lock
+bundle

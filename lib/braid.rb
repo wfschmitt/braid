@@ -1,5 +1,6 @@
 require 'braid/version'
 
+
 module Braid
   CONFIG_FILE          = ".braids"
   REQUIRED_GIT_VERSION = "1.6"
