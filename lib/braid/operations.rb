@@ -198,7 +198,11 @@ module Braid
       def fetch(remote = nil, *args)
         args.unshift "-n #{remote}" if remote
         # open4 messes with the pipes of index-pack
-        sh("git fetch #{args.join(' ')} 2>&1 >/dev/null")
+        if VER_WIN32
+          sh("git fetch #{args.join(' ')} 2>&1 > nul")
+        else
+          sh("git fetch #{args.join(' ')} 2>&1 >/dev/null")
+        end
       end
 
       def checkout(treeish)
