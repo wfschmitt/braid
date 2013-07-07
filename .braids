@@ -1,0 +1,8 @@
+{
+  "vendor/dredit": {
+    "url": "git@github.com:googledrive/dredit.git",
+    "remote": "master/braid/vendor/dredit",
+    "branch": "master",
+    "squashed": true
+  }
+}
