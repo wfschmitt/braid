@@ -15,8 +15,12 @@ describe "Adding a mirror in a clean repository" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `#{BRAID_BIN} add #{@skit1}`
-      end
+        if VER_WIN32
+          `ruby #{BRAID_BIN} add #{@skit1}`
+        else
+          `#{BRAID_BIN} add #{@skit1}`
+        end
+        end
 
       file_name = "skit1/layouts/layout.liquid"
       output    = `diff -U 3 #{File.join(FIXTURE_PATH, file_name)} #{File.join(TMP_PATH, "shiny", file_name)}`
@@ -29,7 +33,11 @@ describe "Adding a mirror in a clean repository" do
 
     it "should create .braids and add the mirror to it" do
       in_dir(@shiny) do
-        `#{BRAID_BIN} add #{@skit1}`
+         if VER_WIN32
+          `ruby #{BRAID_BIN} add #{@skit1}`
+        else
+          `#{BRAID_BIN} add #{@skit1}`
+        end
       end
 
       braids = YAML::load_file("#{@shiny}/.braids")

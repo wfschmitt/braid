@@ -1,6 +1,11 @@
 require File.dirname(__FILE__) + '/../integration_helper'
 
 describe "Updating a mirror without conflicts" do
+if RUBY_PLATFORM =~ /(win|w32)/
+  VER_WIN32=true
+else
+  VER_WIN32=false
+end
 
   before do
     FileUtils.rm_rf(TMP_PATH)
@@ -13,7 +18,11 @@ describe "Updating a mirror without conflicts" do
       @skit1 = create_git_repo_from_fixture("skit1")
 
       in_dir(@shiny) do
-        `#{BRAID_BIN} add #{@skit1}`
+          if VER_WIN32
+            `ruby #{BRAID_BIN} add #{@skit1}`
+          else
+            `#{BRAID_BIN} add #{@skit1}`
+          end
       end
 
       update_dir_from_fixture("skit1", "skit1.1")
@@ -32,8 +41,12 @@ describe "Updating a mirror without conflicts" do
 
     it "should add the files and commit" do
       in_dir(@shiny) do
-        `#{BRAID_BIN} update skit1`
-      end
+        if VER_WIN32
+          `ruby #{BRAID_BIN} update skit1`
+         else
+           `#{BRAID_BIN} update skit1`
+         end
+       end
 
       file_name = "layouts/layout.liquid"
       output    = `diff -U 3 #{File.join(FIXTURE_PATH, "skit1.2", file_name)} #{File.join(TMP_PATH, "shiny", "skit1", file_name)}`
