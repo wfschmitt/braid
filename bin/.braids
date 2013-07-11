@@ -1,8 +1,0 @@
-{
-  "dreditxx": {
-    "url": "git@github.com:googledrive/dredit.git",
-    "remote": "master/braid/dreditxx",
-    "branch": "master",
-    "squashed": true
-  }
-}
