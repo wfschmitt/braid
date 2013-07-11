@@ -129,6 +129,8 @@ module Braid
               err = stderr.read
               status = wait_thr.value # Process::Status object returned.
             }
+            status = status.exitstatus
+
         else
           Open4.popen4(cmd) do |pid, stdin, stdout, stderr|
             out = stdout.read
@@ -326,6 +328,7 @@ module Braid
             err = stderr.read
             status = wait_thr.value # Process::Status object returned.
           }
+        status = status.exitstatus
         else
           status = Open4.popen4("git apply --index --whitespace=nowarn #{args.join(' ')} -") do |pid, stdin, stdout, stderr|
             stdin.puts(diff)
